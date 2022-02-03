@@ -15,7 +15,6 @@ void main() {
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -114,55 +113,59 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // return Defaultscaffold();
     return SafeArea(
       child: Scaffold(
-        body: Center(
-          child: Padding(
-            padding: _pagePadding,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              mainAxisSize: MainAxisSize.max,
-              children: <Widget>[
-                _buildIcon(),
-                const SizedBox(height: 24),
-                _buildTitle(context),
-                const SizedBox(height: 16),
-                _buildDescription(context),
-                const SizedBox(height: 12),
-                _buildSearchBar(context),
-                const SizedBox(height: 32),
-                if (_isLoading)
-                  const Center(child: CircularProgressIndicator()),
-                if (_error.isNotEmpty) Center(child: Text(_error)),
-                if (!_isLoading && _error.isEmpty && _responseList.isNotEmpty)
-                  Expanded(
-                    child: GridView.count(
-                      crossAxisCount: 2,
-                      mainAxisSpacing: 16,
-                      crossAxisSpacing: 24,
-                      childAspectRatio: (140 / 168),
-                      controller: ScrollController(keepScrollOffset: false),
-                      shrinkWrap: true,
-                      children: List.generate(_responseList.length, (index) {
-                        return InkWell(
-                          onTap: () => _onItemSelected(context, index),
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(24),
-                            child: SizedBox(
-                              height: 168,
-                              width: 140,
-                              child: Image.network(
-                                _responseList[index].imageUrl ?? _imageUrl,
-                                fit: BoxFit.fill,
-                              ),
+        body: Padding(
+          padding: _pagePadding, //const Paddings.homePage()
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            mainAxisSize: MainAxisSize.max,
+            children: <Widget>[
+              _buildIcon(),
+              //const EmptySpace.bigHeight(),
+              const SizedBox(height: 24),
+              _buildTitle(context),
+              const SizedBox(height: 16),
+              _buildDescription(context),
+              const SizedBox(height: 12),
+              //AnimeSearchBar(onSearched: (query) => _onSearched(context, query)),
+              _buildSearchBar(context),
+              const SizedBox(height: 32),
+              //TODO: bloc selector widget tüm durumları kapsasın
+              //const BlocSelectorAnimeList(),
+              if (_isLoading) const Center(child: CircularProgressIndicator()),
+              if (_error.isNotEmpty) Center(child: Text(_error)),
+              if (!_isLoading && _error.isEmpty && _responseList.isNotEmpty)
+                Expanded(
+                  child: GridView.count(
+                    crossAxisCount: 2,
+                    mainAxisSpacing: 16,
+                    crossAxisSpacing: 24,
+                    childAspectRatio: (140 / 168),
+                    controller: ScrollController(keepScrollOffset: false),
+                    shrinkWrap: true,
+                    children: List.generate(_responseList.length, (index) {
+                      //return AnimeListItem(_responseList[index]);
+                      return InkWell(
+                        onTap: () => _onItemSelected(context, index),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(24),
+                          child: SizedBox(
+                            height: 168,
+                            width: 140,
+                            child: Image.network(
+                              //_responseList[index].getImageUrl,
+                              _responseList[index].imageUrl ?? _imageUrl,
+                              fit: BoxFit.fill,
                             ),
                           ),
-                        );
-                      }),
-                    ),
+                        ),
+                      );
+                    }),
                   ),
-              ],
-            ),
+                ),
+            ],
           ),
         ),
       ),

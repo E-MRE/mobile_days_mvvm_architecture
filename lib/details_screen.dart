@@ -2,6 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'models/anime_search_model.dart';
+import 'utils/decorations/empty_space.dart';
+import 'widgets/default_scaffold.dart';
+import 'widgets/detail_list_item.dart';
+import 'widgets/episode.dart';
+import 'widgets/sub_title.dart';
 
 class DetailScreen extends StatelessWidget {
   const DetailScreen({
@@ -14,41 +19,38 @@ class DetailScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        body: Padding(
-          padding: const EdgeInsets.all(24.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              _buildTitle(context, responseModel.title ?? '-'),
-              const SizedBox(height: 24),
-              _buildTopArea(context),
-              const SizedBox(height: 4),
-              _buildEpisode(),
-              const SizedBox(height: 24),
-              _buildDetails(context),
-              const SizedBox(height: 18),
-              Expanded(
-                child: ElevatedButton(
-                  onPressed: () async =>
-                      _openUrl(website: responseModel.url ?? _imageUrl),
-                  child: const Text('Web Sitesine Git'),
-                  style: ElevatedButton.styleFrom(
-                      fixedSize: const Size.fromWidth(double.infinity),
-                      primary: const Color.fromRGBO(30, 188, 253, 1),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
-                      )),
-                ),
-              ),
-            ],
+    return DefaultScaffold(
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          SubTitle(text: responseModel.title ?? '-'),
+          const EmptySpace.bigHeigh(),
+          _buildTopArea(context),
+          const EmptySpace.extraSmallHeigh(),
+          _buildEpisode(),
+          const EmptySpace.bigHeigh(),
+          _buildDetails(context),
+          const EmptySpace.normalHeigh(),
+          Expanded(
+            //TODO: child: WebSiteButton(webiste: responseModel.url ?? _imageUrl),
+            child: ElevatedButton(
+              onPressed: () async =>
+                  _openUrl(website: responseModel.url ?? _imageUrl),
+              child: const Text('Web Sitesine Git'),
+              style: ElevatedButton.styleFrom(
+                  fixedSize: const Size.fromWidth(double.infinity),
+                  primary: const Color.fromRGBO(30, 188, 253, 1),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  )),
+            ),
           ),
-        ),
+        ],
       ),
     );
   }
 
+  //TODO: burada olmaz
   Future<void> _openUrl(
       {VoidCallback? errorCallback, required String website}) async {
     if (await canLaunch(website)) {
@@ -83,29 +85,7 @@ class DetailScreen extends StatelessWidget {
 
   Widget _buildEpisode() {
     return Row(
-      children: [
-        Container(
-          width: 154,
-          height: 28,
-          child: Center(
-            child: Padding(
-              padding: const EdgeInsets.all(2.0),
-              child: Text(
-                '${responseModel.episodes} Episodes',
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 14,
-                  fontFamily: 'DMSans-Medium',
-                ),
-              ),
-            ),
-          ),
-          decoration: BoxDecoration(
-            color: const Color.fromRGBO(79, 191, 103, 1),
-            borderRadius: BorderRadius.circular(8),
-          ),
-        )
-      ],
+      children: [Episode(text: '${responseModel.episodes} Episodes')],
     );
   }
 
@@ -114,69 +94,19 @@ class DetailScreen extends StatelessWidget {
       flex: 5,
       child: ListView(
         children: [
-          _buildListItem(context, title: 'Type:', value: responseModel.type),
-          _buildListItem(context, title: 'Rated:', value: responseModel.rated),
-          _buildListItem(
-            context,
+          DetailListItem(title: 'Type:', value: responseModel.type),
+          DetailListItem(title: 'Rated:', value: responseModel.rated),
+          DetailListItem(
             title: 'Score:',
             value: responseModel.score?.toString(),
           ),
-          _buildListItem(
-            context,
+          DetailListItem(
             title: 'Members:',
             value: responseModel.members?.toString(),
           ),
-          _buildListItem(
-            context,
-            title: 'Start Date:',
-            value: responseModel.startDate,
-          ),
-          _buildListItem(context,
-              title: 'End Date:', value: responseModel.endDate),
+          DetailListItem(title: 'Start Date:', value: responseModel.startDate),
+          DetailListItem(title: 'End Date:', value: responseModel.endDate),
         ],
-      ),
-    );
-  }
-
-  Widget _buildListItem(BuildContext context,
-      {required String title, String? value}) {
-    return Column(
-      children: [
-        const Divider(height: 2),
-        Padding(
-          padding: const EdgeInsets.symmetric(vertical: 8.0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(title,
-                  style: Theme.of(context).textTheme.bodyText1?.copyWith(
-                        fontFamily: 'DMSans-Bold',
-                        color: const Color.fromRGBO(27, 29, 33, 1),
-                      )),
-              Text(value ?? '-',
-                  style: Theme.of(context).textTheme.bodyText1?.copyWith(
-                        fontFamily: 'DMSans-SemiBold',
-                        color: const Color.fromRGBO(27, 29, 33, 0.4),
-                      )),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildTitle(BuildContext context, String text) {
-    return SizedBox(
-      width: double.infinity,
-      child: Text(
-        text,
-        style: Theme.of(context).textTheme.headline4?.copyWith(
-            fontFamily: 'DMSans-Bold',
-            letterSpacing: -1.6,
-            fontSize: 32,
-            color: const Color.fromRGBO(27, 29, 33, 1)),
-        textAlign: TextAlign.center,
-        overflow: TextOverflow.ellipsis,
       ),
     );
   }
