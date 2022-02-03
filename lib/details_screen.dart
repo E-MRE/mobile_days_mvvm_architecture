@@ -14,6 +14,7 @@ class DetailScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    //TODO: default scafflod oluştur
     return SafeArea(
       child: Scaffold(
         body: Padding(
@@ -21,6 +22,7 @@ class DetailScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              //TODO: widget yap
               _buildTitle(context, responseModel.title ?? '-'),
               const SizedBox(height: 24),
               _buildTopArea(context),
@@ -30,6 +32,7 @@ class DetailScreen extends StatelessWidget {
               _buildDetails(context),
               const SizedBox(height: 18),
               Expanded(
+                //TODO: widget yap
                 child: ElevatedButton(
                   onPressed: () async =>
                       _openUrl(website: responseModel.url ?? _imageUrl),
@@ -49,6 +52,7 @@ class DetailScreen extends StatelessWidget {
     );
   }
 
+  //TODO: burada olmaz
   Future<void> _openUrl(
       {VoidCallback? errorCallback, required String website}) async {
     if (await canLaunch(website)) {
@@ -84,6 +88,7 @@ class DetailScreen extends StatelessWidget {
   Widget _buildEpisode() {
     return Row(
       children: [
+        //TODO: widget yap
         Container(
           width: 154,
           height: 28,
@@ -114,6 +119,7 @@ class DetailScreen extends StatelessWidget {
       flex: 5,
       child: ListView(
         children: [
+          //TODO: widget yap
           _buildListItem(context, title: 'Type:', value: responseModel.type),
           _buildListItem(context, title: 'Rated:', value: responseModel.rated),
           _buildListItem(
@@ -138,6 +144,7 @@ class DetailScreen extends StatelessWidget {
     );
   }
 
+  //TODO: widget yap
   Widget _buildListItem(BuildContext context,
       {required String title, String? value}) {
     return Column(

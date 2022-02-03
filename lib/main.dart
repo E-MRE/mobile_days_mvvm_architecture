@@ -15,7 +15,6 @@ void main() {
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -29,6 +28,7 @@ class MyApp extends StatelessWidget {
   }
 }
 
+//TODO: stateless yapılacak
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
 
@@ -70,6 +70,7 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
+  //TODO: burada olmaz
   Future<void> _retrieveData() async {
     _setError('');
 
@@ -114,6 +115,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    //TODO: default scafflod oluştur
     return SafeArea(
       child: Scaffold(
         body: Center(
@@ -124,6 +126,7 @@ class _HomeScreenState extends State<HomeScreen> {
               mainAxisSize: MainAxisSize.max,
               children: <Widget>[
                 _buildIcon(),
+                //TODO: custom sized box yap, kalıtım ile
                 const SizedBox(height: 24),
                 _buildTitle(context),
                 const SizedBox(height: 16),
@@ -135,6 +138,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   const Center(child: CircularProgressIndicator()),
                 if (_error.isNotEmpty) Center(child: Text(_error)),
                 if (!_isLoading && _error.isEmpty && _responseList.isNotEmpty)
+                  //TODO: bloc selector list
                   Expanded(
                     child: GridView.count(
                       crossAxisCount: 2,
@@ -144,6 +148,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       controller: ScrollController(keepScrollOffset: false),
                       shrinkWrap: true,
                       children: List.generate(_responseList.length, (index) {
+                        //TODO: widget yap
                         return InkWell(
                           onTap: () => _onItemSelected(context, index),
                           child: ClipRRect(
@@ -195,6 +200,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  //TODO: widget yap
   Widget _buildSearchBar(BuildContext context) {
     return Container(
       height: 56,
