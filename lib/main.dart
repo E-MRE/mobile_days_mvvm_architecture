@@ -28,7 +28,6 @@ class MyApp extends StatelessWidget {
   }
 }
 
-//TODO: stateless yapılacak
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
 
@@ -70,7 +69,6 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
-  //TODO: burada olmaz
   Future<void> _retrieveData() async {
     _setError('');
 
@@ -115,59 +113,59 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    //TODO: default scafflod oluştur
+    // return Defaultscaffold();
     return SafeArea(
       child: Scaffold(
-        body: Center(
-          child: Padding(
-            padding: _pagePadding,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              mainAxisSize: MainAxisSize.max,
-              children: <Widget>[
-                _buildIcon(),
-                //TODO: custom sized box yap, kalıtım ile
-                const SizedBox(height: 24),
-                _buildTitle(context),
-                const SizedBox(height: 16),
-                _buildDescription(context),
-                const SizedBox(height: 12),
-                _buildSearchBar(context),
-                const SizedBox(height: 32),
-                if (_isLoading)
-                  const Center(child: CircularProgressIndicator()),
-                if (_error.isNotEmpty) Center(child: Text(_error)),
-                if (!_isLoading && _error.isEmpty && _responseList.isNotEmpty)
-                  //TODO: bloc selector list
-                  Expanded(
-                    child: GridView.count(
-                      crossAxisCount: 2,
-                      mainAxisSpacing: 16,
-                      crossAxisSpacing: 24,
-                      childAspectRatio: (140 / 168),
-                      controller: ScrollController(keepScrollOffset: false),
-                      shrinkWrap: true,
-                      children: List.generate(_responseList.length, (index) {
-                        //TODO: widget yap
-                        return InkWell(
-                          onTap: () => _onItemSelected(context, index),
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(24),
-                            child: SizedBox(
-                              height: 168,
-                              width: 140,
-                              child: Image.network(
-                                _responseList[index].imageUrl ?? _imageUrl,
-                                fit: BoxFit.fill,
-                              ),
+        body: Padding(
+          padding: _pagePadding, //const Paddings.homePage()
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            mainAxisSize: MainAxisSize.max,
+            children: <Widget>[
+              _buildIcon(),
+              //const EmptySpace.bigHeight(),
+              const SizedBox(height: 24),
+              _buildTitle(context),
+              const SizedBox(height: 16),
+              _buildDescription(context),
+              const SizedBox(height: 12),
+              //AnimeSearchBar(onSearched: (query) => _onSearched(context, query)),
+              _buildSearchBar(context),
+              const SizedBox(height: 32),
+              //TODO: bloc selector widget tüm durumları kapsasın
+              //const BlocSelectorAnimeList(),
+              if (_isLoading) const Center(child: CircularProgressIndicator()),
+              if (_error.isNotEmpty) Center(child: Text(_error)),
+              if (!_isLoading && _error.isEmpty && _responseList.isNotEmpty)
+                Expanded(
+                  child: GridView.count(
+                    crossAxisCount: 2,
+                    mainAxisSpacing: 16,
+                    crossAxisSpacing: 24,
+                    childAspectRatio: (140 / 168),
+                    controller: ScrollController(keepScrollOffset: false),
+                    shrinkWrap: true,
+                    children: List.generate(_responseList.length, (index) {
+                      //return AnimeListItem(_responseList[index]);
+                      return InkWell(
+                        onTap: () => _onItemSelected(context, index),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(24),
+                          child: SizedBox(
+                            height: 168,
+                            width: 140,
+                            child: Image.network(
+                              //_responseList[index].getImageUrl,
+                              _responseList[index].imageUrl ?? _imageUrl,
+                              fit: BoxFit.fill,
                             ),
                           ),
-                        );
-                      }),
-                    ),
+                        ),
+                      );
+                    }),
                   ),
-              ],
-            ),
+                ),
+            ],
           ),
         ),
       ),
@@ -200,7 +198,6 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  //TODO: widget yap
   Widget _buildSearchBar(BuildContext context) {
     return Container(
       height: 56,
