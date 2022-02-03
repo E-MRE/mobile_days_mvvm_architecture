@@ -3,8 +3,12 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:mobile_days_mvvm_architecture/utils/decorations/empty_space.dart';
+import 'package:mobile_days_mvvm_architecture/widgets/anime_list_item.dart';
+import 'package:mobile_days_mvvm_architecture/widgets/anime_search_bar.dart';
+import 'package:mobile_days_mvvm_architecture/widgets/default_scaffold.dart';
+import 'package:mobile_days_mvvm_architecture/widgets/sub_title.dart';
 
-import 'details_screen.dart';
 import 'models/anime_search_model.dart';
 import 'utils/constants/assets_contants.dart';
 
@@ -40,7 +44,6 @@ class _HomeScreenState extends State<HomeScreen> {
   final http.Client _client = http.Client();
 
   final String _url = 'https://api.jikan.moe/v3/search/anime?q=';
-  final String _imageUrl = 'https://wallpaperaccess.com/full/3471309.jpg';
   final String _description =
       'İstediğiniz animeyi arayarak bulabilir ve detaylarına ulaşabilirsiniz.';
   String _error = '';
@@ -102,89 +105,47 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  void _onItemSelected(BuildContext context, int index) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => DetailScreen(responseModel: _responseList[index]),
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
-    // return Defaultscaffold();
-    return SafeArea(
-      child: Scaffold(
-        body: Padding(
-          padding: _pagePadding, //const Paddings.homePage()
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            mainAxisSize: MainAxisSize.max,
-            children: <Widget>[
-              _buildIcon(),
-              //const EmptySpace.bigHeight(),
-              const SizedBox(height: 24),
-              _buildTitle(context),
-              const SizedBox(height: 16),
-              _buildDescription(context),
-              const SizedBox(height: 12),
-              //AnimeSearchBar(onSearched: (query) => _onSearched(context, query)),
-              _buildSearchBar(context),
-              const SizedBox(height: 32),
-              //TODO: bloc selector widget tüm durumları kapsasın
-              //const BlocSelectorAnimeList(),
-              if (_isLoading) const Center(child: CircularProgressIndicator()),
-              if (_error.isNotEmpty) Center(child: Text(_error)),
-              if (!_isLoading && _error.isEmpty && _responseList.isNotEmpty)
-                Expanded(
-                  child: GridView.count(
-                    crossAxisCount: 2,
-                    mainAxisSpacing: 16,
-                    crossAxisSpacing: 24,
-                    childAspectRatio: (140 / 168),
-                    controller: ScrollController(keepScrollOffset: false),
-                    shrinkWrap: true,
-                    children: List.generate(_responseList.length, (index) {
-                      //return AnimeListItem(_responseList[index]);
-                      return InkWell(
-                        onTap: () => _onItemSelected(context, index),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(24),
-                          child: SizedBox(
-                            height: 168,
-                            width: 140,
-                            child: Image.network(
-                              //_responseList[index].getImageUrl,
-                              _responseList[index].imageUrl ?? _imageUrl,
-                              fit: BoxFit.fill,
-                            ),
-                          ),
-                        ),
-                      );
-                    }),
-                  ),
-                ),
-            ],
-          ),
-        ),
+    return DefaultScaffold(
+      padding: _pagePadding,
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        mainAxisSize: MainAxisSize.max,
+        children: <Widget>[
+          _buildIcon(),
+          const EmptySpace.bigHeigh(),
+          const SubTitle(text: 'Anime Ara'),
+          const EmptySpace.normalHeigh(),
+          _buildDescription(context),
+          const EmptySpace.normalHeigh(),
+          AnimeSearchBar(onSearched: (query) => _retrieveData()),
+          const EmptySpace.veryBigHeigh(),
+          //TODO: bloc selector widget tüm durumları kapsasın
+          //const BlocSelectorAnimeList(),
+          if (_isLoading) const Center(child: CircularProgressIndicator()),
+          if (_error.isNotEmpty) Center(child: Text(_error)),
+          if (!_isLoading && _error.isEmpty && _responseList.isNotEmpty)
+            Expanded(
+              child: GridView.count(
+                crossAxisCount: 2,
+                mainAxisSpacing: 16,
+                crossAxisSpacing: 24,
+                childAspectRatio: (140 / 168),
+                controller: ScrollController(keepScrollOffset: false),
+                shrinkWrap: true,
+                children: List.generate(_responseList.length, (index) {
+                  return AnimeListItem(item: _responseList[index]);
+                }),
+              ),
+            ),
+        ],
       ),
     );
   }
 
   Widget _buildIcon() {
     return Image.asset(AssetsConstants.png.marsIcon, height: 80, width: 148);
-  }
-
-  Widget _buildTitle(BuildContext context) {
-    return Text(
-      'Anime Ara',
-      style: Theme.of(context).textTheme.headline3?.copyWith(
-            color: Colors.black,
-            fontFamily: 'DMSans-Bold',
-            fontSize: 36,
-          ),
-    );
   }
 
   Widget _buildDescription(BuildContext context) {
@@ -195,59 +156,6 @@ class _HomeScreenState extends State<HomeScreen> {
             fontFamily: 'DMSans-Regular',
             letterSpacing: -0.36,
           ),
-    );
-  }
-
-  Widget _buildSearchBar(BuildContext context) {
-    return Container(
-      height: 56,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(28),
-        border: Border.all(color: const Color.fromRGBO(27, 29, 33, 0.1)),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 8.0),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Expanded(
-              child: Center(
-                child: TextField(
-                  controller: _controller,
-                  style: Theme.of(context).textTheme.bodyText2?.copyWith(
-                      fontFamily: 'DMSans-Regular',
-                      letterSpacing: -0.3,
-                      color: const Color.fromRGBO(4, 4, 21, 1)),
-                  decoration: InputDecoration(
-                    hintText: 'Bir anime ara...',
-                    hintStyle: TextStyle(
-                      color: Colors.black.withOpacity(0.5),
-                      fontFamily: 'DMSans-Italic',
-                      fontSize: 14,
-                    ),
-                    contentPadding: const EdgeInsets.all(16),
-                    enabledBorder: InputBorder.none,
-                    focusedBorder: InputBorder.none,
-                  ),
-                ),
-              ),
-            ),
-            IconButton(
-              onPressed: () async => _retrieveData(),
-              icon: Container(
-                height: 40,
-                width: 40,
-                child: const Icon(Icons.search_outlined),
-                decoration: BoxDecoration(
-                  color: const Color.fromRGBO(237, 251, 255, 1),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
-            )
-          ],
-        ),
-      ),
     );
   }
 }
