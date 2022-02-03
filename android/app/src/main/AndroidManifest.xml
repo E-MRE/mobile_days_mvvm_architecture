@@ -2,6 +2,7 @@
     package="com.example.mobile_days_mvvm_architecture">
    <application
         android:label="mobile_days_mvvm_architecture"
+        android:usesCleartextTraffic="true"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
@@ -31,4 +32,11 @@
             android:name="flutterEmbedding"
             android:value="2" />
     </application>
+
+<queries>
+  <intent>
+    <action android:name="android.intent.action.VIEW" />
+    <data android:scheme="https" />
+    /intent>
+</queries>
 </manifest>
