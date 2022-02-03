@@ -1,4 +1,12 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+
+import 'details_screen.dart';
+import 'models/anime_search_model.dart';
+import 'utils/constants/assets_contants.dart';
 
 void main() {
   runApp(const MyApp());
@@ -12,104 +20,231 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Flutter Demo',
+      home: const HomeScreen(),
       theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // Try running your application with "flutter run". You'll see the
-        // application has a blue toolbar. Then, without quitting the app, try
-        // changing the primarySwatch below to Colors.green and then invoke
-        // "hot reload" (press "r" in the console where you ran "flutter run",
-        // or simply save your changes to "hot reload" in a Flutter IDE).
-        // Notice that the counter didn't reset back to zero; the application
-        // is not restarted.
         primarySwatch: Colors.blue,
+        scaffoldBackgroundColor: const Color.fromRGBO(255, 255, 255, 1),
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({Key? key, required this.title}) : super(key: key);
-
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
-  final String title;
+class HomeScreen extends StatefulWidget {
+  const HomeScreen({Key? key}) : super(key: key);
 
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+class _HomeScreenState extends State<HomeScreen> {
+  final TextEditingController _controller = TextEditingController();
+  final http.Client _client = http.Client();
 
-  void _incrementCounter() {
+  final String _url = 'https://api.jikan.moe/v3/search/anime?q=';
+  final String _imageUrl = 'https://wallpaperaccess.com/full/3471309.jpg';
+  final String _description =
+      'İstediğiniz animeyi arayarak bulabilir ve detaylarına ulaşabilirsiniz.';
+  String _error = '';
+  bool _isLoading = false;
+
+  final EdgeInsetsGeometry _pagePadding =
+      const EdgeInsets.all(40).copyWith(bottom: 16);
+
+  List<AnimeSearchModel> _responseList = [];
+
+  void _changeLoading() {
     setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
+      _isLoading = !_isLoading;
     });
+  }
+
+  void _setError(String message) {
+    setState(() {
+      _error = message;
+    });
+  }
+
+  void _setList(List<AnimeSearchModel> list) {
+    setState(() {
+      _responseList = list;
+    });
+  }
+
+  Future<void> _retrieveData() async {
+    _setError('');
+
+    if (_controller.text.isEmpty) {
+      _setError('Boş arama yapılamaz');
+    }
+
+    try {
+      _changeLoading();
+      var uri = Uri.parse('$_url${_controller.text}');
+      var response =
+          await _client.get(uri).timeout(const Duration(seconds: 10));
+
+      if (response.statusCode != HttpStatus.ok) {
+        _changeLoading();
+        _setError('Veriler alınırken bir hata meydana geldi');
+      }
+
+      var json = jsonDecode(response.body);
+      if (json['results'] != null && json['results'] is List) {
+        var list = (json['results'] as List)
+            .map((item) => AnimeSearchModel.fromJson(item))
+            .toList();
+
+        _setList(list);
+      }
+      _changeLoading();
+    } catch (error) {
+      _changeLoading();
+      _setError(error.toString());
+    }
+  }
+
+  void _onItemSelected(BuildContext context, int index) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => DetailScreen(responseModel: _responseList[index]),
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
-    return Scaffold(
-      appBar: AppBar(
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
+    return SafeArea(
+      child: Scaffold(
+        body: Center(
+          child: Padding(
+            padding: _pagePadding,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              mainAxisSize: MainAxisSize.max,
+              children: <Widget>[
+                _buildIcon(),
+                const SizedBox(height: 24),
+                _buildTitle(context),
+                const SizedBox(height: 16),
+                _buildDescription(context),
+                const SizedBox(height: 12),
+                _buildSearchBar(context),
+                const SizedBox(height: 32),
+                if (_isLoading)
+                  const Center(child: CircularProgressIndicator()),
+                if (_error.isNotEmpty) Center(child: Text(_error)),
+                if (!_isLoading && _error.isEmpty && _responseList.isNotEmpty)
+                  Expanded(
+                    child: GridView.count(
+                      crossAxisCount: 2,
+                      mainAxisSpacing: 16,
+                      crossAxisSpacing: 24,
+                      childAspectRatio: (140 / 168),
+                      controller: ScrollController(keepScrollOffset: false),
+                      shrinkWrap: true,
+                      children: List.generate(_responseList.length, (index) {
+                        return InkWell(
+                          onTap: () => _onItemSelected(context, index),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(24),
+                            child: SizedBox(
+                              height: 168,
+                              width: 140,
+                              child: Image.network(
+                                _responseList[index].imageUrl ?? _imageUrl,
+                                fit: BoxFit.fill,
+                              ),
+                            ),
+                          ),
+                        );
+                      }),
+                    ),
+                  ),
+              ],
+            ),
+          ),
+        ),
       ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Invoke "debug painting" (press "p" in the console, choose the
-          // "Toggle Debug Paint" action from the Flutter Inspector in Android
-          // Studio, or the "Toggle Debug Paint" command in Visual Studio Code)
-          // to see the wireframe for each widget.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text(
-              'You have pushed the button this many times:',
+    );
+  }
+
+  Widget _buildIcon() {
+    return Image.asset(AssetsConstants.png.marsIcon, height: 80, width: 148);
+  }
+
+  Widget _buildTitle(BuildContext context) {
+    return Text(
+      'Anime Ara',
+      style: Theme.of(context).textTheme.headline3?.copyWith(
+            color: Colors.black,
+            fontFamily: 'DMSans-Bold',
+            fontSize: 36,
+          ),
+    );
+  }
+
+  Widget _buildDescription(BuildContext context) {
+    return Text(
+      _description,
+      style: Theme.of(context).textTheme.subtitle1?.copyWith(
+            color: Colors.black.withOpacity(0.5),
+            fontFamily: 'DMSans-Regular',
+            letterSpacing: -0.36,
+          ),
+    );
+  }
+
+  Widget _buildSearchBar(BuildContext context) {
+    return Container(
+      height: 56,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(28),
+        border: Border.all(color: const Color.fromRGBO(27, 29, 33, 0.1)),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 8.0),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Expanded(
+              child: Center(
+                child: TextField(
+                  controller: _controller,
+                  style: Theme.of(context).textTheme.bodyText2?.copyWith(
+                      fontFamily: 'DMSans-Regular',
+                      letterSpacing: -0.3,
+                      color: const Color.fromRGBO(4, 4, 21, 1)),
+                  decoration: InputDecoration(
+                    hintText: 'Bir anime ara...',
+                    hintStyle: TextStyle(
+                      color: Colors.black.withOpacity(0.5),
+                      fontFamily: 'DMSans-Italic',
+                      fontSize: 14,
+                    ),
+                    contentPadding: const EdgeInsets.all(16),
+                    enabledBorder: InputBorder.none,
+                    focusedBorder: InputBorder.none,
+                  ),
+                ),
+              ),
             ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headline4,
-            ),
+            IconButton(
+              onPressed: () async => _retrieveData(),
+              icon: Container(
+                height: 40,
+                width: 40,
+                child: const Icon(Icons.search_outlined),
+                decoration: BoxDecoration(
+                  color: const Color.fromRGBO(237, 251, 255, 1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+            )
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
 }
