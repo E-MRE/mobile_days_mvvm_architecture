@@ -26,6 +26,7 @@ class DetailListItem extends StatelessWidget {
                 child: Text(
                   value ?? '-',
                   overflow: TextOverflow.ellipsis,
+                  textAlign: TextAlign.right,
                   style: _setStyle(context, _valueColor, isTitle: false),
                 ),
               ),

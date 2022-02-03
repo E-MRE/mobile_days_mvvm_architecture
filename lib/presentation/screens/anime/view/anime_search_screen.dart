@@ -34,7 +34,7 @@ class AnimeSearchScreen extends StatelessWidget {
               children: <Widget>[
                 _buildIcon(),
                 const EmptySpace.bigHeigh(),
-                const SubTitle(text: 'Anime Ara'),
+                const SubTitle(text: 'Anime Ara', align: TextAlign.left),
                 const EmptySpace.normalHeigh(),
                 _buildDescription(context),
                 const EmptySpace.normalHeigh(),
