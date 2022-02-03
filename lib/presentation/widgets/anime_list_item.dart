@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:mobile_days_mvvm_architecture/models/anime_search_model.dart';
 
-import '../details_screen.dart';
-import '../models/anime_search_model.dart';
+import '../screens/anime/view/details_screen.dart';
 
 class AnimeListItem extends StatelessWidget {
   const AnimeListItem({
     Key? key,
-    required this.item,
+    this.item,
     this.radius = 24,
     this.height = 168,
     this.width = 140,
   }) : super(key: key);
 
-  final AnimeSearchModel item;
+  final AnimeSearchModel? item;
   final double radius;
   final double height;
   final double width;
@@ -29,7 +29,7 @@ class AnimeListItem extends StatelessWidget {
           width: width,
           child: Image.network(
             //item.getImageUrl,
-            item.imageUrl ?? _imageUrl,
+            item?.imageUrl ?? _imageUrl,
             fit: BoxFit.fill,
           ),
         ),
@@ -41,7 +41,8 @@ class AnimeListItem extends StatelessWidget {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => DetailScreen(responseModel: item),
+        builder: (context) =>
+            DetailScreen(responseModel: item ?? AnimeSearchModel()),
       ),
     );
   }
