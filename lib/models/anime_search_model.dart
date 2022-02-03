@@ -13,30 +13,29 @@ class AnimeSearchModel {
   num? members;
   String? rated;
 
-  ///TODO: Anlat! model içerisinde de getter setterlar yazmak. Kapsülleme etc.
-  //   String? get getStartDate {
-  //   var date = DateTime.tryParse(startDate ?? '');
+  String? get getStartDate {
+    var date = DateTime.tryParse(startDate ?? '');
 
-  //   if (date == null) return '-';
+    if (date == null) return '-';
 
-  //   return '${date.day}.${date.month}.${date.year}';
-  // }
+    return '${date.day}.${date.month}.${date.year}';
+  }
 
-  // String? get getEndDate {
-  //   var date = DateTime.tryParse(endDate ?? '');
+  String? get getEndDate {
+    var date = DateTime.tryParse(endDate ?? '');
 
-  //   if (date == null) return '-';
+    if (date == null) return '-';
 
-  //   return '${date.day}.${date.month}.${date.year}';
-  // }
+    return '${date.day}.${date.month}.${date.year}';
+  }
 
-  // String get getImageUrl => (imageUrl?.isNotEmpty ?? false)
-  //     ? imageUrl!
-  //     : 'https://wallpaperaccess.com/full/3471309.jpg';
+  String get getImageUrl => (imageUrl?.isNotEmpty ?? false)
+      ? imageUrl!
+      : 'https://wallpaperaccess.com/full/3471309.jpg';
 
-  // String get getWebsite => (url?.isNotEmpty ?? false)
-  //     ? url!
-  //     : 'https://wallpaperaccess.com/full/3471309.jpg';
+  String get getWebsite => (url?.isNotEmpty ?? false)
+      ? url!
+      : 'https://wallpaperaccess.com/full/3471309.jpg';
 
   AnimeSearchModel({
     this.id,

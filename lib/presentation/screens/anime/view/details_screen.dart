@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart';
 
-import 'models/anime_search_model.dart';
-import 'utils/decorations/empty_space.dart';
-import 'widgets/default_scaffold.dart';
-import 'widgets/detail_list_item.dart';
-import 'widgets/episode.dart';
-import 'widgets/sub_title.dart';
+import '../../../../models/anime_search_model.dart';
+import '../../../../utils/decorations/empty_space.dart';
+import '../../../widgets/default_scaffold.dart';
+import '../../../widgets/detail_list_item.dart';
+import '../../../widgets/episode.dart';
+import '../../../widgets/sub_title.dart';
+import '../../../widgets/website_button.dart';
 
 class DetailScreen extends StatelessWidget {
   const DetailScreen({
@@ -15,7 +15,6 @@ class DetailScreen extends StatelessWidget {
   }) : super(key: key);
 
   final AnimeSearchModel responseModel;
-  final String _imageUrl = 'https://wallpaperaccess.com/full/3471309.jpg';
 
   @override
   Widget build(BuildContext context) {
@@ -32,32 +31,11 @@ class DetailScreen extends StatelessWidget {
           _buildDetails(context),
           const EmptySpace.normalHeigh(),
           Expanded(
-            //TODO: child: WebSiteButton(webiste: responseModel.url ?? _imageUrl),
-            child: ElevatedButton(
-              onPressed: () async =>
-                  _openUrl(website: responseModel.url ?? _imageUrl),
-              child: const Text('Web Sitesine Git'),
-              style: ElevatedButton.styleFrom(
-                  fixedSize: const Size.fromWidth(double.infinity),
-                  primary: const Color.fromRGBO(30, 188, 253, 1),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                  )),
-            ),
+            child: WebSiteButton(website: responseModel.getWebsite),
           ),
         ],
       ),
     );
-  }
-
-  //TODO: burada olmaz
-  Future<void> _openUrl(
-      {VoidCallback? errorCallback, required String website}) async {
-    if (await canLaunch(website)) {
-      await launch(website);
-    } else {
-      errorCallback?.call();
-    }
   }
 
   Widget _buildTopArea(BuildContext context) {
@@ -67,7 +45,7 @@ class DetailScreen extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Image.network(responseModel.imageUrl ?? _imageUrl),
+          Image.network(responseModel.getImageUrl),
           const SizedBox(width: 16),
           Expanded(
               child: Text(
@@ -104,8 +82,9 @@ class DetailScreen extends StatelessWidget {
             title: 'Members:',
             value: responseModel.members?.toString(),
           ),
-          DetailListItem(title: 'Start Date:', value: responseModel.startDate),
-          DetailListItem(title: 'End Date:', value: responseModel.endDate),
+          DetailListItem(
+              title: 'Start Date:', value: responseModel.getStartDate),
+          DetailListItem(title: 'End Date:', value: responseModel.getEndDate),
         ],
       ),
     );
