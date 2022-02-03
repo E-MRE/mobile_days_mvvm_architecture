@@ -26,6 +26,9 @@ class EmptySpace extends SizedBox {
   ///Dikeyden `24.0` boşluk oluşturur.
   const EmptySpace.bigHeigh({Key? key}) : super(key: key, height: 24);
 
+  ///Dikeyden `32.0` boşluk oluşturur.
+  const EmptySpace.veryBigHeigh({Key? key}) : super(key: key, height: 32);
+
   ///Yataydan `4.0` boşluk oluşturur.
   const EmptySpace.extraSmallWidth({Key? key}) : super(key: key, width: 4);
 
